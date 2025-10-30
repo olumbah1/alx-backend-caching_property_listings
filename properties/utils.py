@@ -1,15 +1,12 @@
 from django.core.cache import cache
 from .models import Property
 
-CACHE_KEY = "all_properties"
-CACHE_TIMEOUT = 60 * 60 
-
 def get_all_properties():
     """
-    Return all properties, using low-level cache.
-    Caches an *evaluated* list of property dicts (not a QuerySet object).
+    Fetch all properties from cache if available,
+    otherwise from database and store in cache for 1 hour (3600 seconds).
     """
-    data = cache.get(CACHE_KEY)
+    data = cache.get('all_properties')
     if data is not None:
         return data
 
@@ -17,5 +14,5 @@ def get_all_properties():
         'property_id', 'title', 'description', 'price', 'location', 'created_at'
     )
     data = list(queryset)
-    cache.set(CACHE_KEY, data, CACHE_TIMEOUT)
+    cache.set('all_properties', data, 3600)  
     return data
